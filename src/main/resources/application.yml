@@ -1,0 +1,15 @@
+server:
+  port: 80
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: utf-8
+  
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://120.26.62.251:3306/duowikidb?useUnicode=true&autoReconnect=true&characterEncoding=utf-8&useSSL=false
+    username: duowiki
+    password: '!QAZ2wsx'
+  thymeleaf:
+    cache: false
