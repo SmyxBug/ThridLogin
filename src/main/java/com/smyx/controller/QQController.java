@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
 @Controller
-public class IndexController {
+public class QQController {
 
 	/**
 	 * 根目录请求

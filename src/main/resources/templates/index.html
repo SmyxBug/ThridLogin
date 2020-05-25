@@ -2,19 +2,153 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>QQ登录测试</title>
+<title>第三方登录测试</title>
 </head>
 <body>
-	<div style="padding: 40px">
-		<font color="black"><strong>QQ一键登录测试</strong></font>
-		<br /> <br /> 
+	<div style="padding: 10px">
 		<a href="/qqLogin"><img src="/images/qqlogin.png" /></a>
 	</div>
-	<div style="padding: 40px">
-		<font color="black"><strong>新浪微博一键登录测试</strong></font>
-		<br /> <br /> 
+	<div style="padding: 10px">
 		<a href="/sinaLogin"><img src="/images/wblogin.png" /></a>
 	</div>
+	<div style="padding: 10px">
+		<font color="black"><strong><a href="/wxPubliclogin">微信公众号（微信公众平台）登录</a></strong></font>
+		<br>
+		<font color="black"><strong><a href="/wxOpenlogin">微信开放平台登录</a></strong></font>
+	</div>
+	<div style="padding: 10px">
+		<button id="customBtn" type="button">Google登录</button>
+		<div id="name"></div>
+	</div>
+	<div style="padding: 10px">
+		<!-- facebook登录按钮 -->
+		<fb:login-button scope="public_profile, email" onlogin="checkLoginState();"></fb:login-button>
+		<!-- 获取登陆后的username显示 -->
+		<div id="status"></div>
+	</div>
+	<div style="padding: 10px">
+		<button class="twBtn" onclick = "login_twitter('twitter')" >Twitter登录</button>
+	</div>
+	<div style="padding: 10px">
+		<font color="black"><strong><a href="/instagramLogin">Instagram登录</a></strong></font>
+	</div>
+	<br>
+	<br>
+	<br>
 	<div style="padding: 40px">yunhuansoft 版权所有。</div>
 </body>
+
+<script src="https://apis.google.com/js/api:client.js"></script>
+<!-- 以下代码是Google登录使用 -->
+<script type="text/javascript">
+var googleUser = {};
+var startApp = function() {
+	gapi.load('auth2', function(){
+		// 初始化服务
+		auth2 = gapi.auth2.init({
+			client_id: '671266147435-n3qduj441ap5kcbk9ai7doilmobk6fhe.apps.googleusercontent.com', // 客户端ID 需要自行申请
+			cookiepolicy: 'single_host_origin',
+			scope: 'profile' // 可以请求除了默认的'profile' and 'email'之外的数据
+		});
+		// 给登录按钮绑定登录事件
+		attachSignin(document.getElementById('customBtn'));
+	});
+};
+function attachSignin(element) {
+	auth2.attachClickHandler(element, {}, function(googleUser) {
+		document.getElementById('name').innerText = "Signed in: " + googleUser.getBasicProfile().getName();
+		var profile = auth2.currentUser.get().getBasicProfile();
+		console.log(">>>>>>>>>> 登录成功的用户信息...");
+		console.log(profile);
+		console.log('ID: ' + profile.getId());
+		console.log('Full Name: ' + profile.getName());
+		console.log('Given Name: ' + profile.getGivenName());
+		console.log('Family Name: ' + profile.getFamilyName());
+		console.log('Image URL: ' + profile.getImageUrl());
+		console.log('Email: ' + profile.getEmail());
+    }, function(error) {
+      	console.log(JSON.stringify(error, undefined, 2));
+    });
+}
+startApp();
+</script>
+<!-- 以下代码是facebook登录使用 -->
+<script type="text/javascript">
+// 点击facebook登录按钮触发
+function checkLoginState() {
+	FB.getLoginStatus(function(response) {
+		statusChangeCallback(response);
+	});
+}
+// 校验是否连接facebook
+function statusChangeCallback(response) { 
+	if (response.status === 'connected') {
+		loginWithFaceBook(); // 已连接facebook调用登录获取用户信息
+    } else {
+		document.getElementById('status').innerHTML = '请点击登录.';
+    }
+}
+// 返回授权的用户信息
+function loginWithFaceBook() {
+	FB.api('/me', function(response) {
+		// response 的 返回值 格式 { name: "San Zhang", id: "257723142259414" }
+		document.getElementById('status').innerHTML = '当前登录用户是, ID: ' + response.id + ', NAME: ' + response.name;
+	});
+}
+window.fbAsyncInit = function() {
+	// 初始化
+	FB.init({
+		appId : '520853661926799', // 自己去facebook开发者中心创建一个应用就有了这个参数
+		cookie : true,
+		xfbml : true,
+		version : 'v7.0' // 对应自己开发的时候的版本
+	});
+    FB.getLoginStatus(function(response) {
+		statusChangeCallback(response);
+    });
+};
+(function(d, s, id) {
+	var js, fjs = d.getElementsByTagName(s)[0];
+	if (d.getElementById(id)) return;
+	js = d.createElement(s); js.id = id;
+	js.src = "https://connect.facebook.net/zh_CN/sdk.js";
+	fjs.parentNode.insertBefore(js, fjs);
+} (document, 'script', 'facebook-jssdk'));
+</script>
+<!-- 以下代码是Twitter登录使用 -->
+<script type="text/javascript">
+window.twttr = (function(d, s, id) {
+	var js, fjs = d.getElementsByTagName(s)[0],
+	t = window.twttr || {};
+	if (d.getElementById(id)) return t;
+	js = d.createElement(s);
+	js.id = id;
+	js.src = "https://platform.twitter.com/widgets.js";
+	fjs.parentNode.insertBefore(js, fjs);
+	t._e = [];
+	t.ready = function(f) {
+		t._e.push(f);
+	};
+	return t;
+} (document, "script", "twitter-wjs"));
+
+hello.init({'twitter' : appkey}, {
+	redirect_uri:'/', //代理后的重定向路径，可不填
+	oauth_proxy: 'https://auth-server.herokuapp.com/proxy' //这里使用默认的代理
+});
+
+function login_twitter(network){  //登录方法，并将twitter 作为参数传入
+	// Twitter instance
+	var twitter = hello(network);
+	// Login
+	twitter.login().then(function(r){
+		// Get Profile
+		return twitter.api('/me');
+	}, log).then(function(p) {
+		console.log("Connected to "+ network+" as " + p.name);
+		var res = JSON.stringify(p); // 因为得不到token，但是这步已经得到用户所有信息，所以将用户信息转成JSON字符串给后台
+		console.log(p);
+	}, log);
+}
+</script>
 </html>
